@@ -4,17 +4,17 @@ VALUES ('Sales'),
         ('Finance'),
         ('Human Resources');
 
-INSERT INTO Employee (first_name, last_name, role, manager_id)
-VALUES ('John', 'Doe', 'Manager', NULL),
-        ('Jane', 'Doe', 'Sales Associate', 1),
-        ('Bob', 'Smith', 'Marketing Coordinator', 1),
-        ('Mary', 'Johnson', 'Financial Analyst', 1),
-        ('Mark', 'Lee', 'Human Resources Manager', 1),
-        ('Sara', 'Chen', 'Accountant', 4),
-        ('Tom', 'Wang', 'Recruiter', 5),
-        ('Emily', 'Nguyen', 'Payroll Specialist', 5),
-        ('David', 'Park', 'Sales Associate', 1),
-        ('Amy', 'Kim', 'Marketing Coordinator', 2);
+INSERT INTO Employee (first_name, last_name, role_id, manager_id)
+VALUES ('John', 'Doe', 1, NULL),
+        ('Jane', 'Doe', 2, 1),
+        ('Bob', 'Smith', 3, 1),
+        ('Mary', 'Johnson', 4, 1),
+        ('Mark', 'Lee', 5, 1),
+        ('Sara', 'Chen', 6, 4),
+        ('Tom', 'Wang', 7, 5),
+        ('Emily', 'Nguyen', 8, 5),
+        ('David', 'Park', 9, 1),
+        ('Amy', 'Kim', 10, 2);
 
 INSERT INTO Role (title, salary, department_id)
 VALUES ('Manager', 100000, 1),

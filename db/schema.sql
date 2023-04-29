@@ -1,7 +1,7 @@
-DROP IF EXISTS Company_db;
-CREATE DATABASE Company_db;
+DROP IF EXISTS company_db;
+CREATE DATABASE company_db;
 
-USE Company_db;
+USE company_db;
 
 DROP TABLE IF EXISTS Employee;
 CREATE TABLE Employee (

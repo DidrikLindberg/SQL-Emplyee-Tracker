@@ -22,3 +22,4 @@ const db_connection = mysql.createConnection(
 );
 
 module.exports = db_connection;
+console.log(db_connection);

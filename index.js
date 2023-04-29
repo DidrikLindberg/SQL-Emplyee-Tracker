@@ -61,8 +61,8 @@ initialQuery = () => {
         type: "rawlist",
         message: "What would you like to do?",
         choices: [
-          "View department, roles or employees",
-          "Add department, roles or employees",
+          "View department, roles or employee",
+          "Add department, roles or employee",
           "Update employee role",
           "Remove employee",
           "View department budgets",
@@ -72,11 +72,11 @@ initialQuery = () => {
       ])
       .then((answer) => {
         switch (answer.action) {
-          case "View department, roles or employees":
+          case "View department, roles or employee":
             viewTable();
             break;
   
-          case "Add department, roles or employees":
+          case "Add department, roles or employee":
             addValue();
             break;
   
@@ -110,7 +110,7 @@ initialQuery = () => {
             choices: [
                 "Departments",
                 "Roles",
-                "Employees",
+                "Employee",
                 "Back",
             ],
             },
@@ -125,7 +125,7 @@ initialQuery = () => {
                 viewRoles();
                 break;
 
-            case "Employees":
+            case "Employee":
                 viewEmployees();
 
             case "Back":
@@ -296,281 +296,394 @@ initialQuery = () => {
         });
     }
 
-    // function to update values
-    updateValue = () => {
-        inquirer.prompt([
-            {
-            name: "update",
-            type: "rawlist",
-            message: "Which table would you like to update?",
-            choices: [
-                "Departments",
-                "Roles",
-                "Employees",
-                "Back",
-            ],
-            },
-        ])
-        .then((answer) => {
-            switch (answer.update) {
-            case "Departments":
-                updateDepartment();
-                break;
 
-            case "Roles":
-                updateRole();
-                break;
 
-            case "Employees":
-                updateEmployee();
-                break;
-
-            case "Back":
-                initialQuery();
-                break;
-            }
-        });
-    }
-
-    // function to update department
-    updateDepartment = () => {
-        inquirer.prompt([
-            {
-                name: "department",
-                type: "input",
-                message: "What is the name of the department you would like to update?",
-            },
-            {
-                name: "id",
-                type: "input",
-                message: "What is the ID of the department you would like to update?",
-            },
-        ])
-        .then((answer) => {
-            db_connection.query(
-                "UPDATE department SET ? WHERE ?",
-                    {
-                        name: answer.department,
-                        id: answer.id,
-                    },
-                (err) => {
-                    if (err) throw err;
-                    console.log("Your department was updated successfully!");
-                    initialQuery();
-                }
-            );
-        });
-    }
-
-    // function to update role
+    // function to update employee role
     updateRole = () => {
+        console.log("------------------------------------------------------------------------------------");
+        console.log("------------------------------------------------------------------------------------");
+        console.log("------------------------------------------------------------------------------------");
+        console.log("------------------------------------------------------------------------------------");
+        console.log("------------------------------------------------------------------------------------");
+        //display all employees
+        db_connection.query("SELECT * FROM employee", (err, res) => {
+            if (err) throw err;
+            console.table(res);
+            
+        });
+        let listofEmployees = [];
+        let lostofRoles = [];
+        let empid = null;
+
         inquirer.prompt([
-            {
-                name: "title",
-                type: "input",
-                message: "What is the name of the role you would like to update?",
-            },
-            {
-                name: "salary",
-                type: "input",
-                message: "What is the salary of the role you would like to update?",
-            },
-            {
-                name: "department_id",
-                type: "input",
-                message: "What is the department ID of the role you would like to update?",
-            },
             {
                 name: "id",
                 type: "input",
-                message: "What is the ID of the role you would like to update?",
+                message: "What is the id of the employee you would like to update?",
             },
         ])
+        // search through db for employees with last name
+        // display
+
         .then((answer) => {
-            db_connection.query(
-                "UPDATE role SET ? WHERE ?",
+            empid = answer.id;
+            //db query to get employee by id
+
+
+            const query = `SELECT * FROM employee
+            JOIN role ON employee.role_id = role.id
+            JOIN department ON role.department_id = department.id 
+            WHERE employee.id = ?`;
+
+            db_connection.query(query, [answer.id], (err, res) => {
+                if (err) throw err;
+                console.table(res);
+                
+            listofEmployees = res.map((employee) => {
+                return {
+                    name: `${employee.first_name} ${employee.last_name}`,
+                    value: employee.id,
+                };
+            });
+            //display all roles
+            db_connection.query("SELECT * FROM role", (err, res) => {
+                if (err) throw err;
+
+                listofRoles = res.map((role) => {
+                    return {
+                        name: role.title,
+                        value: role.id,
+                    };
+                });
+                inquirer.prompt([
                     {
-                        title: answer.title,
-                        salary: answer.salary,
-                        department_id: answer.department_id,
-                        id: answer.id,
+                        name: "role",
+                        type: "rawlist",
+                        message: "What is the new role of the employee?",
+                        choices: listofRoles,
                     },
-                (err) => {
-                    if (err) throw err;
-                    console.log("Your role was updated successfully!");
-                    initialQuery();
-                }
-            );
+                ])
+                .then((answer) => {
+                    db_connection.query(
+                        "UPDATE employee SET ? WHERE ?",
+                        [
+                            {
+                                role_id: answer.role,
+                            },
+                            {
+                                id: empid,
+                            },
+                        ],
+                        (err) => {
+                            if (err) throw err;
+                            console.log("Your employee was updated successfully!");
+                            initialQuery();
+                        }
+                        );
+                    });
+                });
+            });
         });
     }
+                
 
-    // function to update employee
-    updateEmployee = () => {
-        inquirer.prompt([
-            {
-                name: "first_name",
-                type: "input",
-                message: "What is the first name of the employee you would like to update?",
-            },
-            {
-                name: "last_name",
-                type: "input",
-                message: "What is the last name of the employee you would like to update?",
-            },
-            {
-                name: "role_id",
-                type: "input",
-                message: "What is the role ID of the employee you would like to update?",
-            },
-            {
-                name: "manager_id",
-                type: "input",
-                message: "What is the manager ID of the employee you would like to update?",
-            },
-            {
-                name: "id",
-                type: "input",
-                message: "What is the ID of the employee you would like to update?",
-            },
-        ])
-        .then((answer) => {
-            db_connection.query(
-                "UPDATE employee SET ? WHERE ?",
-                    {
-                        first_name: answer.first_name,
-                        last_name: answer.last_name,
-                        role_id: answer.role_id,
-                        manager_id: answer.manager_id,
-                        id: answer.id,
-                    },
-                (err) => {
-                    if (err) throw err;
-                    console.log("Your employee was updated successfully!");
-                    initialQuery();
-                }
-            );
-        });
-    }
 
-    // function to delete values
-    deleteValue = () => {
-        inquirer.prompt([
-            {
-            name: "delete",
-            type: "rawlist",
-            message: "Which table would you like to delete from?",
-            choices: [
-                "Departments",
-                "Roles",
-                "Employees",
-                "Back",
-            ],
-            },
-        ])
-        .then((answer) => {
-            switch (answer.delete) {
-            case "Departments":
-                deleteDepartment();
-                break;
 
-            case "Roles":
-                deleteRole();
-                break;
 
-            case "Employees":
-                deleteEmployee();
-                break;
 
-            case "Back":
-                initialQuery();
-                break;
-            }
-        });
-    }
 
-    // function to delete department
-    deleteDepartment = () => {
-        inquirer.prompt([
-            {
-                name: "department",
-                type: "input",
-                message: "What is the name of the department you would like to delete?",
-            },
-        ])
-        .then((answer) => {
-            db_connection.query( 
-                "DELETE FROM department WHERE ?",
-                    {
-                        name: answer.department,
-                    },
-                (err) => {
-                    if (err) throw err;
-                    console.log("Your department was deleted successfully!");
-                    initialQuery();
-                }
-            );
-        });
-    }
 
-    // function to delete role
-    deleteRole = () => {
-        inquirer.prompt([
-            {
-                name: "title",
-                type: "input",
-                message: "What is the name of the role you would like to delete?",
-            },
-        ])
-        .then((answer) => {
-            db_connection.query(
-                "DELETE FROM role WHERE ?",
-                    {
-                        title: answer.title,
-                    },
-                (err) => {
-                    if (err) throw err;
-                    console.log("Your role was deleted successfully!");
-                    initialQuery();
-                }
-            );
-        });
-    }
 
-    // function to delete employee
-    deleteEmployee = () => {
-        inquirer.prompt([
-            {
-                name: "first_name",
-                type: "input",
-                message: "What is the first name of the employee you would like to delete?",
-            },
-            {
-                name: "last_name",
-                type: "input",
-                message: "What is the last name of the employee you would like to delete?",
-            },
-            {
-                name: "id",
-                type: "input",
-                message: "What is the ID of the employee you would like to delete?",
-            },
-        ])
-        .then((answer) => {
-            db_connection.query(
-                "DELETE FROM employee WHERE ?",
-                    {
-                        first_name: answer.first_name,
-                        last_name: answer.last_name,
-                        id: answer.id,
-                    },
-                (err) => {
-                    if (err) throw err;
-                    console.log("Your employee was deleted successfully!");
-                    initialQuery();
-                }
-            );
-        });
-    }
+    // // function to update department
+    // updateDepartment = () => {
+    //     inquirer.prompt([
+    //         {
+    //             name: "department",
+    //             type: "input",
+    //             message: "What is the name of the department you would like to update?",
+    //         },
+    //         {
+    //             name: "id",
+    //             type: "input",
+    //             message: "What is the ID of the department you would like to update?",
+    //         },
+    //     ])
+    //     .then((answer) => {
+    //         db_connection.query(
+    //             "UPDATE department SET ? WHERE ?",
+    //                 {
+    //                     name: answer.department,
+    //                     id: answer.id,
+    //                 },
+    //             (err) => {
+    //                 if (err) throw err;
+    //                 console.log("Your department was updated successfully!");
+    //                 initialQuery();
+    //             }
+    //         );
+    //     });
+    // }
+
+    // // function to update employee role
+    // updateRole = () => {
+    //     db_connection.query("SELECT * FROM employee", (err, res) => {
+    //         if (err) throw err;
+    //         console.table(res);
+    //     });
+    //     inquirer.prompt([
+    //         {
+    //             name: "id",
+    //             type: "input",
+    //             message: "What is the ID of the role you would like to update?",
+    //         },
+    //     ])
+    //     .then((answer) => {
+
+    //         employeeID = answer.id;
+    //         // db query to find all employees by user inputted ID
+    //         // then puts part of the response into an array for subsequent inquirer question
+    //         // then displays info to the user in table
+    //         const query = `SELECT employee.id AS Employee_ID, first_name AS First_Name, last_name AS Last_Name, title AS Title, salary AS Salary, department.name AS Department FROM employee
+    //         INNER JOIN role ON employee.role_Id = role.role_id
+    //         INNER JOIN department ON role.dept_id = department.dept_id 
+    //         WHERE ?`;
+    //         //
+    //         db_connection.query(query, { id: answer.id }, (err, res) => {
+    //             if (err) throw err;
+        
+    //             console.log(` `)
+    //             console.log(`====================================================================================`);
+    //             console.table(res);
+    //             console.log(`====================================================================================`);
+    //             console.log(` `);
+        
+    //             listOfEmployee = res.map(employee => (
+    //               {
+    //                 name: employee.First_Name,
+    //                 value: employee.Employee_ID
+    //               }
+    //             ));
+        
+    //             // db query to find all roles and then put them into an array for a subsequent inquirer question
+    //             db_connection.query("SELECT * FROM roles", (err, res) => {
+    //               if (err) throw err;
+        
+    //               listOfRoles = res.map(role => (
+    //                 {
+    //                   name: role.title,
+    //                   value: role.role_id
+    //                 }
+    //               ))
+        
+    //               inquirer.prompt([
+    //                 {
+    //                   type: "list",
+    //                   name: "nameConfirm",
+    //                   message: "Please select the employee to confirm",
+    //                   choices: listOfEmployee
+    //                 },
+    //                 {
+    //                   type: "list",
+    //                   name: "roleChoice",
+    //                   message: "Please select a new role for the employee",
+    //                   choices: listOfRoles
+    //                 }
+    //               ])
+    //               .then((answers) => {
+        
+    //                 const query = `UPDATE employee SET role_id = ${answers.roleChoice} WHERE emp_id = ${answers.nameConfirm}`;
+    //                 db_connection.query(query, (err, res) => {
+    //                     if (err) throw err;
+    //                 });
+    //               })
+    //                 .then(() => {
+    //                   const query = `SELECT emp_id AS Employee_ID, first_name AS First_Name, last_name AS Last_Name, title AS Title, salary AS Salary, departments.name AS Department FROM employee 
+    //                     INNER JOIN roles ON employee.role_Id = roles.role_id
+    //                     INNER JOIN departments ON roles.dept_id = departments.dept_id 
+    //                     WHERE ?`;
+    //                   db_connection.query(query, {last_name: employeeLastName }, (err,res) => {
+    //                     if (err) throw err;
+    //                     console.log(` `);
+    //                     console.log(`====================================================================================`);
+    //                     console.table(res);
+    //                     console.log(`====================================================================================`);
+    //                     console.log(` `);
+    //                     initialQuery();
+    //                   })
+    //                 });
+    //             });
+    //           });        
+    //         });
+            
+    //     }
+
+    // // function to update employee
+    // updateEmployee = () => {
+    //     inquirer.prompt([
+    //         {
+    //             name: "first_name",
+    //             type: "input",
+    //             message: "What is the first name of the employee you would like to update?",
+    //         },
+    //         {
+    //             name: "last_name",
+    //             type: "input",
+    //             message: "What is the last name of the employee you would like to update?",
+    //         },
+    //         {
+    //             name: "role_id",
+    //             type: "input",
+    //             message: "What is the role ID of the employee you would like to update?",
+    //         },
+    //         {
+    //             name: "manager_id",
+    //             type: "input",
+    //             message: "What is the manager ID of the employee you would like to update?",
+    //         },
+    //         {
+    //             name: "id",
+    //             type: "input",
+    //             message: "What is the ID of the employee you would like to update?",
+    //         },
+    //     ])
+    //     .then((answer) => {
+    //         db_connection.query(
+    //             "UPDATE employee SET ? WHERE ?",
+    //                 {
+    //                     first_name: answer.first_name,
+    //                     last_name: answer.last_name,
+    //                     role_id: answer.role_id,
+    //                     manager_id: answer.manager_id,
+    //                     id: answer.id,
+    //                 },
+    //             (err) => {
+    //                 if (err) throw err;
+    //                 console.log("Your employee was updated successfully!");
+    //                 initialQuery();
+    //             }
+    //         );
+    //     });
+    // }
+
+    // // function to delete values
+    // deleteValue = () => {
+    //     inquirer.prompt([
+    //         {
+    //         name: "delete",
+    //         type: "rawlist",
+    //         message: "Which table would you like to delete from?",
+    //         choices: [
+    //             "Departments",
+    //             "Roles",
+    //             "Employee",
+    //             "Back",
+    //         ],
+    //         },
+    //     ])
+    //     .then((answer) => {
+    //         switch (answer.delete) {
+    //         case "Departments":
+    //             deleteDepartment();
+    //             break;
+
+    //         case "Roles":
+    //             deleteRole();
+    //             break;
+
+    //         case "Employee":
+    //             deleteEmployee();
+    //             break;
+
+    //         case "Back":
+    //             initialQuery();
+    //             break;
+    //         }
+    //     });
+    // }
+
+    // // function to delete department
+    // deleteDepartment = () => {
+    //     inquirer.prompt([
+    //         {
+    //             name: "department",
+    //             type: "input",
+    //             message: "What is the name of the department you would like to delete?",
+    //         },
+    //     ])
+    //     .then((answer) => {
+    //         db_connection.query( 
+    //             "DELETE FROM department WHERE ?",
+    //                 {
+    //                     name: answer.department,
+    //                 },
+    //             (err) => {
+    //                 if (err) throw err;
+    //                 console.log("Your department was deleted successfully!");
+    //                 initialQuery();
+    //             }
+    //         );
+    //     });
+    // }
+
+    // // function to delete role
+    // deleteRole = () => {
+    //     inquirer.prompt([
+    //         {
+    //             name: "title",
+    //             type: "input",
+    //             message: "What is the name of the role you would like to delete?",
+    //         },
+    //     ])
+    //     .then((answer) => {
+    //         db_connection.query(
+    //             "DELETE FROM role WHERE ?",
+    //                 {
+    //                     title: answer.title,
+    //                 },
+    //             (err) => {
+    //                 if (err) throw err;
+    //                 console.log("Your role was deleted successfully!");
+    //                 initialQuery();
+    //             }
+    //         );
+    //     });
+    // }
+
+    // // function to delete employee
+    // deleteEmployee = () => {
+    //     inquirer.prompt([
+    //         {
+    //             name: "first_name",
+    //             type: "input",
+    //             message: "What is the first name of the employee you would like to delete?",
+    //         },
+    //         {
+    //             name: "last_name",
+    //             type: "input",
+    //             message: "What is the last name of the employee you would like to delete?",
+    //         },
+    //         {
+    //             name: "id",
+    //             type: "input",
+    //             message: "What is the ID of the employee you would like to delete?",
+    //         },
+    //     ])
+    //     .then((answer) => {
+    //         db_connection.query(
+    //             "DELETE FROM employee WHERE ?",
+    //                 {
+    //                     first_name: answer.first_name,
+    //                     last_name: answer.last_name,
+    //                     id: answer.id,
+    //                 },
+    //             (err) => {
+    //                 if (err) throw err;
+    //                 console.log("Your employee was deleted successfully!");
+    //                 initialQuery();
+    //             }
+    //         );
+    //     });
+    // }
 
 
 

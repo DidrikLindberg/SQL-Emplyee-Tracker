@@ -57,7 +57,7 @@ db_connection.connect((err) => {
         })
     );
   
-    console.log(`                                                                    ` + ("Created By: "));
+    console.log(`                                                                    ` + ("Created By:'Didrik Lindberg' "));
   
     console.log(``);
     console.log(`==============================================================================================`);
@@ -79,7 +79,6 @@ initialQuery = () => {
           "Add department, roles or employee",
           "Update employee role",
           "Remove employee",
-          "View department budgets",
           "Exit",
         ],
       },
@@ -151,12 +150,11 @@ initialQuery = () => {
 
     // function to view departments
     viewDepartments = () => {
-        db_connection.query("SELECT * FROM department", (err, res) => {
+        db_connection.query("SELECT * FROM department;", (err, res) => {
             if (err) throw err;
-            console.table(res);
             console.log(' ');
             console.log(`====================================================================================`);
-            console.log(                              `All Departments:`);
+            console.log(`All Departments:`);
             console.table(res);
             console.log(`====================================================================================`);
             console.log(' ');
@@ -166,10 +164,10 @@ initialQuery = () => {
 
     // function to view roles
     viewRoles = () => {
-        db_connection.query("SELECT * FROM role", (err, res) => {
+        db_connection.query("SELECT r.*, d.name AS Department_Name FROM role r JOIN department d ON r.department_id = d.id;", (err, res) => {
             if (err) throw err;
             console.log(`====================================================================================`);
-            console.log(                              `All Roles:`);
+            console.log(`All Roles:`);
             console.table(res);
             console.log(`====================================================================================`);
             initialQuery();
@@ -178,9 +176,13 @@ initialQuery = () => {
 
     // function to view employees
     viewEmployees = () => {
-        db_connection.query("SELECT * FROM employee", (err, res) => {
+        db_connection.query("SELECT e.id, e.first_name, e.last_name, r.title AS job_title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM Employee e INNER JOIN Role r ON e.role_id = r.id INNER JOIN Department d ON r.department_id = d.id LEFT JOIN Employee m ON e.manager_id = m.id ORDER BY e.id;", 
+        (err, res) => {
             if (err) throw err;
+            console.log(`====================================================================================`);
+            console.log(`All Employees`);
             console.table(res);
+            console.log(`====================================================================================`);
             initialQuery();
         });
     }
@@ -299,8 +301,13 @@ initialQuery = () => {
             {
                 name: "id",
                 type: "input",
-                message: "What is the ID of the employee you would like to add?",
+                message: "What is the ID of the role you would like to add?",
             },
+            {
+                name: "manager_id",
+                type: "input",
+                message: "What is the manager ID of the employee you would like to add?",
+            }
         ])
         .then((answer) => {
             db_connection.query(
@@ -308,7 +315,8 @@ initialQuery = () => {
                 {
                     first_name: answer.first_name,
                     last_name: answer.last_name,
-                    id: answer.id,
+                    role_id: answer.id,
+                    manager_id: answer.manager_id,
                 },
                 (err) => {
                     if (err) throw err;
@@ -345,7 +353,7 @@ initialQuery = () => {
                 message: "What is the id of the employee you would like to update?",
             },
         ])
-        // search through db for employees with last name
+        // search through db for employees with id
         // display
 
         .then((answer) => {

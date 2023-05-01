@@ -8,7 +8,7 @@ This is an app built with Node.js, Inquirer npm package, and a MySQL database, t
 ![myimg](./assets/imgs/Schema.jpg)
 
 ## On Start Visual
-![myimg2](./assets/imgs/Onstartvisual.jpg)
+![myimg2](./assets/imgs/onstartvisual.jpg)
 
 
 ## Walkthrough Video

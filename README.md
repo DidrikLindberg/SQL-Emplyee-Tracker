@@ -5,10 +5,10 @@ This is an app built with Node.js, Inquirer npm package, and a MySQL database, t
 
 ## Schema
 
-![myimg](./assets/imgs/Schema.jpg)
+![myimg](./assets/Schema.jpg)
 
 ## On Start Visual
-![myimg2](./assets/imgs/onstartvisual.jpg)
+![myimg2](./assets/onstartvisual.jpg)
 
 
 ## Walkthrough Video

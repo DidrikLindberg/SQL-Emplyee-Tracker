@@ -9,7 +9,7 @@
 
   * [Description](#Description)
 
-  * [License](#license)
+  * [Licence](#Licence)
 
   * [Contributing](#contributing)
 

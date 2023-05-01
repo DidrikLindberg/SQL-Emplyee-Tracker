@@ -1,8 +1,8 @@
 // npm packages set as variables
 const inquirer = require("inquirer");
-// const figlet = require("figlet");
+const figlet = require("figlet");
 // const chalk = require("chalk");
-// const cTable = require("console.table");
+const cTable = require("console.table");
 
 
 
@@ -40,15 +40,29 @@ const db_connection = mysql.createConnection(
 // modules set as variables
 // const {db_connection} = require('./server.js');
 
+// function that runs upon starting the file
 db_connection.connect((err) => {
     if (err) throw err;
     console.log(`==============================================================================================`);
     console.log(`==============================================================================================`);
     
     console.log(``);
-    console.log(`==============================================================================================`);
+    // Creates title using Figlet package
+    console.log(figlet.textSync("Employee Tracker", {
+          font: "Star Wars",
+          horizontalLayout: "default",
+          verticalLayout: "default",
+          width: 90,
+          whitespaceBreak: false,
+        })
+    );
   
-
+    console.log(`                                                                    ` + ("Created By: "));
+  
+    console.log(``);
+    console.log(`==============================================================================================`);
+    console.log(`==============================================================================================`);
+    console.log(``);
     // calls the initialQuery function that asks the user what they would like to do
     initialQuery();
   });
@@ -140,6 +154,12 @@ initialQuery = () => {
         db_connection.query("SELECT * FROM department", (err, res) => {
             if (err) throw err;
             console.table(res);
+            console.log(' ');
+            console.log(`====================================================================================`);
+            console.log(                              `All Departments:`);
+            console.table(res);
+            console.log(`====================================================================================`);
+            console.log(' ');
             initialQuery();
         });
     }
@@ -148,7 +168,10 @@ initialQuery = () => {
     viewRoles = () => {
         db_connection.query("SELECT * FROM role", (err, res) => {
             if (err) throw err;
+            console.log(`====================================================================================`);
+            console.log(                              `All Roles:`);
             console.table(res);
+            console.log(`====================================================================================`);
             initialQuery();
         });
     }

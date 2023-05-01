@@ -11,8 +11,8 @@ This is an app built with Node.js, Inquirer npm package, and a MySQL database, t
 ![myimg2](./assets/onstartvisual.jpg)
 
 
-## Walkthrough Video
-<iframe src="https://drive.google.com/file/d/1Cu3M0ckNDesj150iNwHq9yzB1vcim1JM/preview" width="640" height="480" allow="autoplay"></iframe>
+
+## [Walkthough Video](https://drive.google.com/file/d/1Cu3M0ckNDesj150iNwHq9yzB1vcim1JM/view)
 
 
 ## Licence

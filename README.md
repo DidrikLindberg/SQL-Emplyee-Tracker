@@ -19,7 +19,7 @@
 ## Description
 This is an app built with Node.js, Inquirer npm package, and a MySQL database, that serves as a Content Management System solution for managing company employees. It was created as a bootcamp coding assignment with a MySQL schema as the only reference. Additionally, the app uses other NPM packages including Figlet, and console.table.
 
-[Walkthough Video](https://drive.google.com/file/d/1Cu3M0ckNDesj150iNwHq9yzB1vcim1JM/view)
+[Walkthough Video](https://drive.google.com/file/d/18Mi2OJD4dbPi4aUJAASueqXCRFxCOQBW/view)
 
 ## Schema
 
